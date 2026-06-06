@@ -10,71 +10,59 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       DATABASE_URL: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:5432/postgres"
       NEXTAUTH_SECRET: "lifepilot-production-secret-s3cur3"
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Push schema to Supabase
-        run: npx prisma db push --accept-data-loss
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-
-      - name: Seed demo data
-        run: npx tsx prisma/seed.ts
-        continue-on-error: true
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
-      - name: Create Vercel project & deploy
+      - name: Link Vercel project
+        run: vercel link --yes --token=$VERCEL_TOKEN
+
+      - name: Set environment variables in Vercel
         run: |
-          # Link / create project automatically
-          vercel link --yes --token=$VERCEL_TOKEN
+          # Remove old values silently
+          vercel env rm DATABASE_URL      production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          vercel env rm NEXTAUTH_SECRET   production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          vercel env rm NEXTAUTH_URL      production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          vercel env rm NEXT_PUBLIC_APP_URL production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
 
-          # Add environment variables
-          for KEY in DATABASE_URL NEXTAUTH_SECRET NEXTAUTH_URL NEXT_PUBLIC_APP_URL; do
-            vercel env rm $KEY production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          done
+          # Add updated values
+          echo "$DATABASE_URL"    | vercel env add DATABASE_URL      production --token=$VERCEL_TOKEN
+          echo "$NEXTAUTH_SECRET" | vercel env add NEXTAUTH_SECRET   production --token=$VERCEL_TOKEN
 
-          echo "$DATABASE_URL"      | vercel env add DATABASE_URL      production --token=$VERCEL_TOKEN
-          echo "$NEXTAUTH_SECRET"   | vercel env add NEXTAUTH_SECRET   production --token=$VERCEL_TOKEN
-
-          # Deploy and capture URL
-          DEPLOY_URL=$(vercel --prod --yes --token=$VERCEL_TOKEN 2>&1 | grep -o 'https://[^ ]*\.vercel\.app' | tail -1)
+      - name: Deploy to Vercel (Vercel runs prisma db push during build)
+        run: |
+          DEPLOY_URL=$(vercel --prod --yes --token=$VERCEL_TOKEN | tail -1)
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
-          echo "🚀 Deployed to: $DEPLOY_URL"
+          echo "Deployed to: $DEPLOY_URL"
 
-          # Set NEXTAUTH_URL to the actual deploy URL
-          echo "$DEPLOY_URL" | vercel env add NEXTAUTH_URL       production --token=$VERCEL_TOKEN
+      - name: Set NEXTAUTH_URL to deployed URL
+        run: |
+          vercel env rm NEXTAUTH_URL        production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          vercel env rm NEXT_PUBLIC_APP_URL production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+
+          echo "$DEPLOY_URL" | vercel env add NEXTAUTH_URL        production --token=$VERCEL_TOKEN
           echo "$DEPLOY_URL" | vercel env add NEXT_PUBLIC_APP_URL production --token=$VERCEL_TOKEN
 
-      - name: Final redeploy with all env vars set
+      - name: Redeploy with correct NEXTAUTH_URL
         run: |
-          FINAL=$(vercel --prod --yes --token=$VERCEL_TOKEN 2>&1 | grep -o 'https://[^ ]*\.vercel\.app' | tail -1)
+          FINAL_URL=$(vercel --prod --yes --token=$VERCEL_TOKEN | tail -1)
           echo ""
-          echo "✅ LifePilot is LIVE at: $FINAL"
-
-      - name: Print live URL
-        run: |
-          echo "============================================"
-          echo "  🎉 LifePilot deployed successfully!"
-          echo "  Demo login: demo@lifepilot.app / demo1234"
-          echo "============================================"
+          echo "================================================"
+          echo "  ✅ LifePilot is LIVE!"
+          echo "  🌐 URL: $FINAL_URL"
+          echo "  📧 Demo: demo@lifepilot.app"
+          echo "  🔑 Pass: demo1234"
+          echo "================================================"
