@@ -20,6 +20,8 @@ jobs:
       NEXT_PUBLIC_APP_URL: "https://lifepilot-ashen.vercel.app"
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      LINE_CHANNEL_SECRET: "4bb20b4a4364e065002deb572f8c6863"
+      LINE_CHANNEL_ACCESS_TOKEN: "cHsji6W49Jm9vG89k5YovfvmCzI04mO5du02vCMu0SwKbqud78A9xmf6Yfqu9uqjLD0KN8jaZsUn5zHpHwpqn0+cv6O1V7tpyZ04MQCREkCPF7ilg9qSvkIhwkZc6xE+0MoGgcqmMansrK6pXUlxPgdB04t89/1O/w1cDnyilFU="
 
     steps:
       - name: Checkout code
@@ -50,21 +52,25 @@ jobs:
         run: |
           # Remove from ALL scopes to avoid stale values winning over the new one
           for env in production preview development; do
-            vercel env rm DATABASE_URL         $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-            vercel env rm DATABASE_URL_DIRECT  $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-            vercel env rm NEXTAUTH_SECRET      $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-            vercel env rm NEXTAUTH_URL         $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-            vercel env rm NEXT_PUBLIC_APP_URL  $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-            vercel env rm GOOGLE_CLIENT_ID     $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-            vercel env rm GOOGLE_CLIENT_SECRET $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm DATABASE_URL              $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm DATABASE_URL_DIRECT       $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm NEXTAUTH_SECRET           $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm NEXTAUTH_URL              $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm NEXT_PUBLIC_APP_URL       $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm GOOGLE_CLIENT_ID          $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm GOOGLE_CLIENT_SECRET      $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm LINE_CHANNEL_SECRET       $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm LINE_CHANNEL_ACCESS_TOKEN $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
           done
 
-          echo "$DATABASE_URL"         | vercel env add DATABASE_URL         production --token=$VERCEL_TOKEN
-          echo "$NEXTAUTH_SECRET"      | vercel env add NEXTAUTH_SECRET      production --token=$VERCEL_TOKEN
-          echo "$NEXTAUTH_URL"         | vercel env add NEXTAUTH_URL         production --token=$VERCEL_TOKEN
-          echo "$NEXT_PUBLIC_APP_URL"  | vercel env add NEXT_PUBLIC_APP_URL  production --token=$VERCEL_TOKEN
-          echo "$GOOGLE_CLIENT_ID"     | vercel env add GOOGLE_CLIENT_ID     production --token=$VERCEL_TOKEN
-          echo "$GOOGLE_CLIENT_SECRET" | vercel env add GOOGLE_CLIENT_SECRET production --token=$VERCEL_TOKEN
+          echo "$DATABASE_URL"              | vercel env add DATABASE_URL              production --token=$VERCEL_TOKEN
+          echo "$NEXTAUTH_SECRET"           | vercel env add NEXTAUTH_SECRET           production --token=$VERCEL_TOKEN
+          echo "$NEXTAUTH_URL"              | vercel env add NEXTAUTH_URL              production --token=$VERCEL_TOKEN
+          echo "$NEXT_PUBLIC_APP_URL"       | vercel env add NEXT_PUBLIC_APP_URL       production --token=$VERCEL_TOKEN
+          echo "$GOOGLE_CLIENT_ID"          | vercel env add GOOGLE_CLIENT_ID          production --token=$VERCEL_TOKEN
+          echo "$GOOGLE_CLIENT_SECRET"      | vercel env add GOOGLE_CLIENT_SECRET      production --token=$VERCEL_TOKEN
+          echo "$LINE_CHANNEL_SECRET"       | vercel env add LINE_CHANNEL_SECRET       production --token=$VERCEL_TOKEN
+          echo "$LINE_CHANNEL_ACCESS_TOKEN" | vercel env add LINE_CHANNEL_ACCESS_TOKEN production --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
         run: |
