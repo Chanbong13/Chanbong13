@@ -51,6 +51,25 @@ export async function POST(req: Request) {
         continue;
       }
 
+      // Handle account linking
+      if (text.startsWith("เชื่อมต่อ ")) {
+        const code = text.replace("เชื่อมต่อ ", "").trim();
+        const targetUser = await prisma.user.findUnique({ where: { id: code } });
+        if (targetUser) {
+          await prisma.user.update({ where: { id: code }, data: { lineUserId } });
+          await client.replyMessage(replyToken, {
+            type: "text",
+            text: `✅ เชื่อมต่อสำเร็จ!\n\nบัญชี LINE เชื่อมต่อกับ ${targetUser.email} แล้ว 🎉\n\nลองพิมพ์ "สรุป" เพื่อดูข้อมูลวันนี้ได้เลย`,
+          });
+        } else {
+          await client.replyMessage(replyToken, {
+            type: "text",
+            text: "❌ รหัสไม่ถูกต้อง กรุณาไปที่ Settings ใน LifePilot แล้วคัดลอกรหัสใหม่อีกครั้ง",
+          });
+        }
+        continue;
+      }
+
       // Handle food logging commands
       if (text.startsWith("กิน ") || text.startsWith("ทาน ") || text.match(/^(กิน|ทาน)/)) {
         const foodName = text.replace(/^(กิน|ทาน)\s*/u, "").trim();

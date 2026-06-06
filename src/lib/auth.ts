@@ -40,12 +40,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.lineUserId = (user as { lineUserId?: string | null }).lineUserId ?? null;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.lineUserId = token.lineUserId as string | null;
       }
       return session;
     },

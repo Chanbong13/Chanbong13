@@ -46,15 +46,26 @@ export default async function SettingsPage() {
           <CardDescription>Connect your LINE account for notifications and food logging</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-xl bg-green-50 dark:bg-green-950/30 p-4 border border-green-200 dark:border-green-900">
-            <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">Setup Instructions</h4>
-            <ol className="text-sm text-green-600 dark:text-green-400 space-y-2 list-decimal list-inside">
-              <li>Create a LINE Official Account at <code className="bg-green-100 dark:bg-green-900 px-1 rounded">developers.line.biz</code></li>
-              <li>Set webhook URL to: <code className="bg-green-100 dark:bg-green-900 px-1 rounded">{process.env.NEXT_PUBLIC_APP_URL}/api/line/webhook</code></li>
-              <li>Add <code className="bg-green-100 dark:bg-green-900 px-1 rounded">LINE_CHANNEL_ACCESS_TOKEN</code> and <code className="bg-green-100 dark:bg-green-900 px-1 rounded">LINE_CHANNEL_SECRET</code> to your .env</li>
-              <li>Users send messages to your LINE OA bot</li>
-            </ol>
-          </div>
+          {session?.user?.lineUserId ? (
+            <div className="rounded-xl bg-green-50 dark:bg-green-950/30 p-4 border border-green-200 dark:border-green-900">
+              <p className="text-green-700 dark:text-green-300 font-semibold">✅ LINE connected</p>
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1">Your LINE account is linked. You can now use all bot commands.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="rounded-xl bg-green-50 dark:bg-green-950/30 p-4 border border-green-200 dark:border-green-900">
+                <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">How to connect LINE</h4>
+                <ol className="text-sm text-green-600 dark:text-green-400 space-y-2 list-decimal list-inside">
+                  <li>Add the LifePilot LINE OA as a friend</li>
+                  <li>Send this exact message to the bot:</li>
+                </ol>
+                <div className="mt-3 p-3 bg-white dark:bg-green-950/50 rounded-lg border border-green-300 dark:border-green-800 font-mono text-sm text-center select-all">
+                  เชื่อมต่อ {session?.user?.id}
+                </div>
+                <p className="text-xs text-green-500 dark:text-green-500 mt-2">Copy the line above and send it to the LINE bot to link your account.</p>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <h4 className="font-medium text-sm">Available Commands:</h4>
