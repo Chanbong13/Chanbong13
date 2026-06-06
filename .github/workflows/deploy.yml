@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      DATABASE_URL: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:5432/postgres"
+      DATABASE_URL: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:6543/postgres?pgbouncer=true&sslmode=require&connect_timeout=15"
+      DATABASE_URL_DIRECT: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:5432/postgres?sslmode=require"
       NEXTAUTH_SECRET: "lifepilot-production-secret-s3cur3"
 
     steps:
@@ -36,18 +37,20 @@ jobs:
       - name: Push database schema
         run: |
           npx prisma generate
-          npx prisma db push --accept-data-loss || echo "Warning: DB push failed (schema may already exist)"
-          npx tsx prisma/seed.ts || echo "Warning: Seed skipped (data may already exist)"
+          DATABASE_URL="$DATABASE_URL_DIRECT" npx prisma db push --accept-data-loss || echo "Warning: DB push failed (schema may already exist)"
+          DATABASE_URL="$DATABASE_URL_DIRECT" npx tsx prisma/seed.ts || echo "Warning: Seed skipped (data may already exist)"
 
       - name: Set environment variables in Vercel
         run: |
           vercel env rm DATABASE_URL        production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          vercel env rm DATABASE_URL_DIRECT production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
           vercel env rm NEXTAUTH_SECRET     production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
           vercel env rm NEXTAUTH_URL        production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
           vercel env rm NEXT_PUBLIC_APP_URL production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
 
-          echo "$DATABASE_URL"    | vercel env add DATABASE_URL      production --token=$VERCEL_TOKEN
-          echo "$NEXTAUTH_SECRET" | vercel env add NEXTAUTH_SECRET   production --token=$VERCEL_TOKEN
+          echo "$DATABASE_URL"        | vercel env add DATABASE_URL        production --token=$VERCEL_TOKEN
+          echo "$DATABASE_URL_DIRECT" | vercel env add DATABASE_URL_DIRECT production --token=$VERCEL_TOKEN
+          echo "$NEXTAUTH_SECRET"     | vercel env add NEXTAUTH_SECRET     production --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
         run: |
