@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: { ignoreDuringBuilds: true },
   images: {
-    domains: ["lh3.googleusercontent.com", "avatars.githubusercontent.com", "profile.line-scdn.net"],
+    remotePatterns: [
+      { hostname: "lh3.googleusercontent.com" },
+      { hostname: "avatars.githubusercontent.com" },
+      { hostname: "profile.line-scdn.net" },
+    ],
   },
   experimental: {
     serverActions: {
