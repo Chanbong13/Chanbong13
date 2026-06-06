@@ -48,13 +48,16 @@ jobs:
 
       - name: Set environment variables in Vercel
         run: |
-          vercel env rm DATABASE_URL         production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm DATABASE_URL_DIRECT  production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm NEXTAUTH_SECRET      production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm NEXTAUTH_URL         production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm NEXT_PUBLIC_APP_URL  production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm GOOGLE_CLIENT_ID     production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm GOOGLE_CLIENT_SECRET production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          # Remove from ALL scopes to avoid stale values winning over the new one
+          for env in production preview development; do
+            vercel env rm DATABASE_URL         $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm DATABASE_URL_DIRECT  $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm NEXTAUTH_SECRET      $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm NEXTAUTH_URL         $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm NEXT_PUBLIC_APP_URL  $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm GOOGLE_CLIENT_ID     $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+            vercel env rm GOOGLE_CLIENT_SECRET $env --yes --token=$VERCEL_TOKEN 2>/dev/null || true
+          done
 
           echo "$DATABASE_URL"         | vercel env add DATABASE_URL         production --token=$VERCEL_TOKEN
           echo "$NEXTAUTH_SECRET"      | vercel env add NEXTAUTH_SECRET      production --token=$VERCEL_TOKEN
