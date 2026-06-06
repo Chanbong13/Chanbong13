@@ -11,9 +11,11 @@ interface Task {
   title: string;
   description: string | null;
   deadline: string | null;
+  reminderAt: string | null;
   status: string;
   priority: string;
   category: string | null;
+  createdAt: string;
 }
 
 interface TaskCardProps {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { verifyLineSignature, getLineClient, estimateCalories } from "@/lib/line";
+import { verifyLineSignature, getLineClient } from "@/lib/line";
+import { estimateCalories } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 
 interface LineEvent {
