@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      # Supavisor transaction pooler — reachable from Vercel serverless runtime
+      # Supavisor transaction pooler — for Vercel serverless runtime (pgbouncer=true disables prepared statements)
       DATABASE_URL: "postgresql://postgres.dwkmjktlyvjnhluzrawc:FreeDom%40020401CB@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
-      # Direct connection — used only by prisma db push in CI (GitHub Actions can reach port 5432)
-      DATABASE_URL_DIRECT: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:5432/postgres?sslmode=require&connect_timeout=15"
+      # Supavisor session pooler — for prisma db push in CI (session mode supports DDL; reachable from GitHub Actions)
+      DATABASE_URL_DIRECT: "postgresql://postgres.dwkmjktlyvjnhluzrawc:FreeDom%40020401CB@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
       NEXTAUTH_SECRET: "lifepilot-production-secret-s3cur3"
       NEXTAUTH_URL: "https://lifepilot-ashen.vercel.app"
       NEXT_PUBLIC_APP_URL: "https://lifepilot-ashen.vercel.app"
