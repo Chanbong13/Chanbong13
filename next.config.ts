@@ -8,11 +8,6 @@ const nextConfig: NextConfig = {
       { hostname: "profile.line-scdn.net" },
     ],
   },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["localhost:3000"],
-    },
-  },
 };
 
 export default nextConfig;
