@@ -14,6 +14,8 @@ jobs:
       DATABASE_URL: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:6543/postgres?pgbouncer=true&sslmode=require&connect_timeout=15"
       DATABASE_URL_DIRECT: "postgresql://postgres:FreeDom%40020401CB@db.dwkmjktlyvjnhluzrawc.supabase.co:5432/postgres?sslmode=require"
       NEXTAUTH_SECRET: "lifepilot-production-secret-s3cur3"
+      NEXTAUTH_URL: "https://lifepilot-ashen.vercel.app"
+      NEXT_PUBLIC_APP_URL: "https://lifepilot-ashen.vercel.app"
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
@@ -52,30 +54,20 @@ jobs:
           vercel env rm GOOGLE_CLIENT_ID     production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
           vercel env rm GOOGLE_CLIENT_SECRET production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
 
-          echo "$DATABASE_URL"        | vercel env add DATABASE_URL        production --token=$VERCEL_TOKEN
-          echo "$DATABASE_URL_DIRECT" | vercel env add DATABASE_URL_DIRECT production --token=$VERCEL_TOKEN
-          echo "$NEXTAUTH_SECRET"     | vercel env add NEXTAUTH_SECRET     production --token=$VERCEL_TOKEN
-          echo "$GOOGLE_CLIENT_ID"    | vercel env add GOOGLE_CLIENT_ID    production --token=$VERCEL_TOKEN
-          echo "$GOOGLE_CLIENT_SECRET"| vercel env add GOOGLE_CLIENT_SECRET production --token=$VERCEL_TOKEN
+          echo "$DATABASE_URL"         | vercel env add DATABASE_URL         production --token=$VERCEL_TOKEN
+          echo "$DATABASE_URL_DIRECT"  | vercel env add DATABASE_URL_DIRECT  production --token=$VERCEL_TOKEN
+          echo "$NEXTAUTH_SECRET"      | vercel env add NEXTAUTH_SECRET      production --token=$VERCEL_TOKEN
+          echo "$NEXTAUTH_URL"         | vercel env add NEXTAUTH_URL         production --token=$VERCEL_TOKEN
+          echo "$NEXT_PUBLIC_APP_URL"  | vercel env add NEXT_PUBLIC_APP_URL  production --token=$VERCEL_TOKEN
+          echo "$GOOGLE_CLIENT_ID"     | vercel env add GOOGLE_CLIENT_ID     production --token=$VERCEL_TOKEN
+          echo "$GOOGLE_CLIENT_SECRET" | vercel env add GOOGLE_CLIENT_SECRET production --token=$VERCEL_TOKEN
 
       - name: Deploy to Vercel
-        run: |
-          DEPLOY_URL=$(vercel --prod --yes --token=$VERCEL_TOKEN | tail -1)
-          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
-          echo "Deployed to: $DEPLOY_URL"
-
-      - name: Update NEXTAUTH_URL with real domain
-        run: |
-          vercel env rm NEXTAUTH_URL        production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          vercel env rm NEXT_PUBLIC_APP_URL production --yes --token=$VERCEL_TOKEN 2>/dev/null || true
-          echo "$DEPLOY_URL" | vercel env add NEXTAUTH_URL        production --token=$VERCEL_TOKEN
-          echo "$DEPLOY_URL" | vercel env add NEXT_PUBLIC_APP_URL production --token=$VERCEL_TOKEN
-
-      - name: Redeploy with correct NEXTAUTH_URL
         run: |
           FINAL_URL=$(vercel --prod --yes --token=$VERCEL_TOKEN | tail -1)
           echo "================================================"
           echo "  ✅ LifePilot is LIVE!"
           echo "  🌐 URL: $FINAL_URL"
+          echo "  🌐 Stable: https://lifepilot-ashen.vercel.app"
           echo "  📧 Demo: demo@lifepilot.app / demo1234"
           echo "================================================"
