@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 export default async function DashboardLayout({
   children,
@@ -15,7 +16,8 @@ export default async function DashboardLayout({
     <div className="min-h-screen gradient-bg">
       <Sidebar />
       <Navbar user={session.user} />
-      <main className="ml-64 pt-16 p-6 min-h-screen transition-all duration-300">
+      <MobileNav />
+      <main className="ml-0 md:ml-64 pt-16 p-4 md:p-6 pb-20 md:pb-6 min-h-screen transition-all duration-300">
         <div className="animate-fade-in">{children}</div>
       </main>
     </div>

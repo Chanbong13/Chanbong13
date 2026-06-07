@@ -26,7 +26,7 @@ export function Navbar({ user }: NavbarProps) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="fixed top-0 right-0 left-64 h-16 z-30 glass border-b flex items-center justify-between px-6 transition-all duration-300">
+    <header className="fixed top-0 right-0 left-0 md:left-64 h-16 z-30 glass border-b flex items-center justify-between px-6 transition-all duration-300">
       <div>
         <p className="text-sm text-muted-foreground">
           {new Date().toLocaleDateString("en-US", {
