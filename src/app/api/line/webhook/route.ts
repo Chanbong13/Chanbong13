@@ -41,17 +41,7 @@ export async function POST(req: Request) {
 
       if (!lineUserId || !replyToken) continue;
 
-      const user = await prisma.user.findUnique({ where: { lineUserId } });
-
-      if (!user) {
-        await client.replyMessage(replyToken, {
-          type: "text",
-          text: "กรุณาเชื่อมต่อ LINE กับ LifePilot ที่ lifepilot.app/settings ก่อนนะ 🙏",
-        });
-        continue;
-      }
-
-      // Handle account linking
+      // Handle account linking BEFORE checking if user is linked
       if (text.startsWith("เชื่อมต่อ ")) {
         const code = text.replace("เชื่อมต่อ ", "").trim();
         const targetUser = await prisma.user.findUnique({ where: { id: code } });
@@ -70,7 +60,15 @@ export async function POST(req: Request) {
         continue;
       }
 
-      // Handle food logging commands
+      const user = await prisma.user.findUnique({ where: { lineUserId } });
+
+      if (!user) {
+        await client.replyMessage(replyToken, {
+          type: "text",
+          text: "กรุณาเชื่อมต่อ LINE กับ LifePilot ก่อนนะ 🙏\n\n1. เข้า lifepilot-ashen.vercel.app\n2. ไปที่ Settings\n3. คัดลอกรหัสแล้วส่งมาในรูปแบบ:\n\nเชื่อมต่อ [รหัส]",
+        });
+        continue;
+      }
       if (text.startsWith("กิน ") || text.startsWith("ทาน ") || text.match(/^(กิน|ทาน)/)) {
         const foodName = text.replace(/^(กิน|ทาน)\s*/u, "").trim();
         const calories = estimateCalories(foodName);
